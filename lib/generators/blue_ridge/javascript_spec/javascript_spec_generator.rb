@@ -10,12 +10,8 @@ module BlueRidge
         empty_directory "#{base_dir}/fixtures"
     
         options = {:class_name_without_spec => class_name_without_spec, :file_path_without_spec => file_path_without_spec}
-        file_path_with_spec.each do |name|
-          template 'javascript_spec.js.erb', "#{base_dir}/#{name}.js", :assigns => options
-        end
-        file_path_without_spec.each do |name|
-          template 'fixture.html.erb', "#{base_dir}/fixtures/#{name}.html", :assigns => options
-        end
+        template 'javascript_spec.js.erb', "#{base_dir}/#{file_path_with_spec}.js", :assigns => options
+        template 'fixture.html.erb', "#{base_dir}/fixtures/#{file_path_without_spec}.html", :assigns => options
       end
 
       def self.gem_root
@@ -26,7 +22,6 @@ module BlueRidge
         File.join(gem_root, 'templates', 'javascript_spec')
       end
 
-
       protected
         def file_path_with_and_without_spec
           if (file_path =~ /_spec$/i)
@@ -35,8 +30,14 @@ module BlueRidge
             [file_path + "_spec", file_path]
           end
         end       
-        alias_method :file_path_without_spec, :file_path_with_and_without_spec 
-        alias_method :file_path_with_spec, :file_path_with_and_without_spec
+
+        def file_path_without_spec
+          file_path_with_and_without_spec.last
+        end
+
+        def file_path_with_spec
+          file_path_with_and_without_spec.first
+        end
   
         def class_name_without_spec
           (class_name =~ /Spec$/) ? class_name.gsub(/Spec$/, "") : class_name
